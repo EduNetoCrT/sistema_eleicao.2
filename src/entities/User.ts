@@ -1,16 +1,29 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import  Permission  from "./Permission";
+import { Role } from "./Role";
+import { Column, Entity, JoinTable, ManyToMany } from "typeorm";
+import  BaseEntity  from "./BaseEntitys";
 
-@Entity('users')
-export class User {
-  @PrimaryGeneratedColumn()
-  id!: number; // Usando o operador de atribuição definitiva
+@Entity("users")
+export class User extends BaseEntity {
+    @Column()
+    usernome!: string; 
 
-  @Column()
-  username!: string; // Atribuição definitiva
+    @Column()
+    password!: string;
 
-  @Column()
-  password!: string; // Atribuição definitiva
+    @ManyToMany(() => Role)
+    @JoinTable({
+        name: "users_roles",
+        joinColumns: [{ name: "user_id" }],
+        inverseJoinColumns: [{ name: "role_id" }],
+    })
+    roles!: Role[];
 
-  @Column()
-  matricula!: string; // Atribuição definitiva
+    @ManyToMany(() => Permission)
+    @JoinTable({
+        name: "users_permissions",
+        joinColumns: [{ name: "user_id" }],
+        inverseJoinColumns: [{ name: "permission_id" }],
+    })
+    permissions!: Permission[];
 }
