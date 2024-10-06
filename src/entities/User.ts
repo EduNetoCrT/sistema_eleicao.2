@@ -1,29 +1,34 @@
-import  Permission  from "./Permission";
-import { Role } from "./Role";
-import { Column, Entity, JoinTable, ManyToMany } from "typeorm";
-import  BaseEntity  from "./BaseEntitys";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from "typeorm";
+import { Presenca } from "./Presenca";
+
+
+
+export enum RoleEnum{
+    ADMIN = 'admin',
+    MESARIO = 'mesario'
+}
 
 @Entity("users")
-export class User extends BaseEntity {
+export class User  {
+    @PrimaryGeneratedColumn("uuid")
+    id!: string;
+  
     @Column()
-    usernome!: string; 
-
+    username!: string;
+  
     @Column()
     password!: string;
 
-    @ManyToMany(() => Role)
-    @JoinTable({
-        name: "users_roles",
-        joinColumns: [{ name: "user_id" }],
-        inverseJoinColumns: [{ name: "role_id" }],
+    @Column({
+        type: 'enum',
+        enum : RoleEnum,
+        default: RoleEnum.MESARIO
     })
-    roles!: Role[];
-
-    @ManyToMany(() => Permission)
-    @JoinTable({
-        name: "users_permissions",
-        joinColumns: [{ name: "user_id" }],
-        inverseJoinColumns: [{ name: "permission_id" }],
-    })
-    permissions!: Permission[];
-}
+    role!: RoleEnum;
+  
+    @CreateDateColumn()
+    created_at!: Date;
+  
+    @OneToMany(() => Presenca, presenca => presenca.registradoPor)
+    presencasRegistradas!: Presenca[];
+  }

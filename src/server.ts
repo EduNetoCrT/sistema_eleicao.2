@@ -1,37 +1,31 @@
 import "reflect-metadata";
-import { AppDataSource } from './database/data-source';
 import express from "express";
-import { routes } from "./routes";  // Corrija o caminho para as rotas
+import { connectToDatabase } from "./database";
+import path from "path";
+import { router } from "./routers";  // Corrija o caminho para as rotas
+import { errorHandler } from "./middleware/errorHandler";
+
 
 const app = express();
+
+// Definir a pasta de views e o motor de template
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 // Middleware para lidar com JSON
 app.use(express.json());
 
 // Registro das rotas
-app.use(routes);
+app.use(router);
 
-// Função para iniciar o servidor e rodar migrações
-const startServer = async () => {
-  try {
-    // Inicializa a conexão com o banco de dados
-    await AppDataSource.initialize();
-    console.log("Data Source has been initialized!");
+app.use(errorHandler)
 
-    // Executa migrações
-    await AppDataSource.runMigrations();
-    console.log("Migrations have been run!");
 
-    // Inicializa o servidor na porta 3000
-    const PORT = 3000;
+// Conectar ao banco de dados
+connectToDatabase();
+
+const PORT = 3000;
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
 
-  } catch (error) {
-    console.error("Error during Data Source initialization:", error);
-  }
-};
-
-// Inicia o servidor
-startServer();

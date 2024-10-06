@@ -1,19 +1,35 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Presenca } from "./Presenca";
 
-@Entity('eleitors')
+export enum StatusEnum{
+    APTO = 'apto',
+    INAPTO = 'inapto'
+}
+
+@Entity()
 export class Eleitor {
-    @PrimaryGeneratedColumn()
-    id!: number;
+  @PrimaryGeneratedColumn()
+  id!: string;
 
-    @Column({ unique: true })
-    matricula!: string;
+  @Column()
+  nome!: string;
 
-    @Column()
-    nome!: string;
+  @Column()
+  matricula!: string;
 
-    @Column()
-    patente!: string;
+  @Column()
+  cpf!: string;
 
-    @Column({ unique: true })
-    cpf!: string;
+  @Column()
+  patente!: string;
+
+  @Column({
+    type: "enum",
+    enum: StatusEnum,
+    default: StatusEnum.APTO
+  })
+  status!: StatusEnum;
+
+  @OneToMany(() => Presenca, presenca => presenca.eleitor)
+  presencas!: Presenca[];
 }
